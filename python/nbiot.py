@@ -5,6 +5,7 @@ import time
 
 print "\r\n==>To test NBIoT module...\r\n"
 
+# The serial port configuration
 ser = serial.Serial(
         port = '/dev/ttyUSB0',
         baudrate = 115200,
@@ -20,7 +21,7 @@ print ser.portstr
 
 
 ser.write('ATI\r\n')
-time.sleep(0.2)
+time.sleep(0.2)    # We must have a delay here otherwise we can't get the RX data.
 ser_buffer_size = ser.inWaiting()
 
 reply_data = ser.read(ser_buffer_size)
@@ -28,7 +29,7 @@ reply_data = ser.read(ser_buffer_size)
 print '\r\n==>Data replied:\r\n', reply_data
 print '\r\n==>ser buffer size:\r\n', ser_buffer_size
 
-
+# Send AT command and check the response string
 def sendCMD (cmd_str,check_str):
     ser.reset_input_buffer()
     dataRev = ''
