@@ -12,7 +12,7 @@ ser = serial.Serial(
         bytesize = serial.EIGHTBITS,
         parity = serial.PARITY_NONE,
         stopbits = serial.STOPBITS_ONE,
-        timeout = 1,
+        timeout = 5,
         xonxoff = None,
         rtscts = None,
         interCharTimeout = None
@@ -34,6 +34,7 @@ def SendCMD (cmd_str, check_str):
         print "==>%s is sent failed, pls check!" % (cmd_str)
         return 1
 
+# Init nbiot module, ready for the network
 def NbiotInit():
     print "Init nbiot module..."
     while SendCMD("ATI", "OK"):
@@ -54,6 +55,7 @@ def NbiotInit():
         pass
     return 0
 
+# Establish connection via tcp or udp
 def NbiotConnect(protocol, ip, port):
     print "Send data with tcp/udp..."
     cmd_str = "AT+QIOPEN=\"%s\",\"%s\",%d" % (protocol, ip, port)
@@ -64,16 +66,18 @@ def NbiotConnect(protocol, ip, port):
      
     return 0
 
+# Send data
 def NbiotSend(data):
     ser.reset_input_buffer()
     ser.write(data)
 
+# <CTRL-Z> the key to send data
 def NbiotSendCmd():
     ser.reset_input_buffer()
     ser.write(chr(0x1A))
     ser.write("\r\n")
 
-
+# Close the connection and deact the network
 def NbiotClose():
     print "Close the connection..."
     while SendCMD("AT+QICLOSE", "OK"):
@@ -82,15 +86,17 @@ def NbiotClose():
         pass
     return 0
 
+# Main logic
 try:
     NbiotInit()
     NbiotConnect("TCP", "logself.vicp.io", 24984)
-#    ser.reset_input_buffer()
+    
     for i in range(5):
         print "send %d" % (i)
         NbiotSend("12345678")
         NbiotSend("\r\n")
     NbiotSendCmd()
+
 finally:
     NbiotClose()
     ser.close()
